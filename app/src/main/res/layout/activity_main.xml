@@ -12,10 +12,11 @@
         android:id="@+id/categoriesList"
         android:layout_width="200dp"
         android:layout_height="match_parent"
-        android:choiceMode="none"
         android:listSelector="@android:color/transparent"
-        android:focusable="true"
         />
+    <!--
+            android:choiceMode="none"
+    -->
 
     <GridView
         android:id="@+id/gridView"

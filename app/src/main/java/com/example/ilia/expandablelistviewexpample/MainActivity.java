@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.GridView;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    String[] data = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"};
     ExpandableListView expandableListView;
     GridView gridView;
     @Override
@@ -27,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         gridView = (GridView) findViewById(R.id.gridView);
+        ArrayAdapter<String> gridAdapter = new ArrayAdapter<String>(this
+                , R.layout.grid_item
+                , R.id.tvText, data);
+        gridView.setAdapter(gridAdapter);
+
         expandableListView = (ExpandableListView) findViewById(R.id.categoriesList);
         List<List<String>> megaList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -55,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
         return true;
     }
 
