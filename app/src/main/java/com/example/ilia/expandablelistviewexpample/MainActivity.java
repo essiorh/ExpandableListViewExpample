@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.GridView;
@@ -15,9 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName();
     String[] data = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"};
     ExpandableListView expandableListView;
     GridView gridView;
+    boolean mIsLvFocused;
+    boolean mIsGvFocused;
+    View mLastActivatedListView = null;
+    View mLastActivatedGridView = null;
+    int mLastLvPosition = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +41,33 @@ public class MainActivity extends AppCompatActivity {
                 , R.layout.grid_item
                 , R.id.tvText, data);
         gridView.setAdapter(gridAdapter);
+        gridView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                deActivateLastGridView();
+                mLastActivatedGridView = view;
+                activateLastGridView();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        gridView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                Log.d(TAG, "grid focus=" + b);
+                if (b) {
+                    mIsGvFocused = b;
+                    activateLastGridView();
+                } else {
+                    deActivateLastGridView();
+                    mIsGvFocused = b;
+                }
+            }
+        });
+        mIsGvFocused = gridView.isFocused();
 
         expandableListView = (ExpandableListView) findViewById(R.id.categoriesList);
         List<List<String>> megaList = new ArrayList<>();
@@ -43,15 +78,29 @@ public class MainActivity extends AppCompatActivity {
             }
             megaList.add(miniList);
         }
-        CategoryAdapter categoryAdapter = new CategoryAdapter(this,megaList);
+        CategoryAdapter categoryAdapter = new CategoryAdapter(this, megaList);
         expandableListView.setAdapter(categoryAdapter);
-        expandableListView.setItemsCanFocus(true);
         expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-                Log.d("11111", "group " +l);
+                Log.d("11111", "group " + l);
 
                 return false;
+            }
+        });
+        expandableListView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                deActivateLastView();
+                mLastActivatedListView = view;
+                activateLastView();
+                Log.d(TAG, "on itemSelect i=" + i + " l=" + l);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -62,11 +111,50 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+        expandableListView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    // not focused
+                    deActivateLastView();
+                    mIsLvFocused = false;
+                    mLastLvPosition = expandableListView.getSelectedItemPosition();
+                } else {
+                    // focused
+                    Log.d(TAG, "focused true selected=" + expandableListView.getSelectedItemPosition());
+                    mIsLvFocused = true;
+                    activateLastView();
+                }
+            }
+        });
+        mIsLvFocused = expandableListView.isFocused();
 
         return true;
     }
 
+    private void activateLastView() {
+        if (mLastActivatedListView != null && mIsLvFocused) {
+            mLastActivatedListView.setActivated(true);
+        }
+    }
 
+    private void deActivateLastView() {
+        if (mLastActivatedListView != null && mIsLvFocused) {
+            mLastActivatedListView.setActivated(false);
+        }
+    }
+
+    private void activateLastGridView() {
+        if (mLastActivatedGridView != null && mIsGvFocused) {
+            mLastActivatedGridView.setActivated(true);
+        }
+    }
+
+    private void deActivateLastGridView() {
+        if (mLastActivatedGridView != null && mIsGvFocused) {
+            mLastActivatedGridView.setActivated(false);
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

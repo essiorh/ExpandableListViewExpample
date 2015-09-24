@@ -12,9 +12,18 @@
         android:id="@+id/categoriesList"
         android:layout_width="200dp"
         android:layout_height="match_parent"
+
+        android:clickable="false"
+        android:focusable="false"
+        android:descendantFocusability="blocksDescendants"
         android:listSelector="@android:color/transparent"
+        android:drawSelectorOnTop="true"
+        android:cacheColorHint="@android:color/transparent"
+
+
         />
     <!--
+        android:listSelector="@color/selector_color"
             android:choiceMode="none"
     -->
 
